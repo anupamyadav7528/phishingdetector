@@ -1,0 +1,5 @@
+url,label,dataset_note
+https://example.com/welcome,0,SYNTHETIC SMOKE DATA - NOT FOR RESEARCH
+http://192.168.1.5/verify-login,1,SYNTHETIC SMOKE DATA - NOT FOR RESEARCH
+https://docs.python.org,0,SYNTHETIC SMOKE DATA - NOT FOR RESEARCH
+http://secure-account.example/urgent-update,1,SYNTHETIC SMOKE DATA - NOT FOR RESEARCH

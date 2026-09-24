@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phishing and Scam Detector</title>
+<style>body{font:16px system-ui;max-width:800px;margin:2rem auto;padding:0 1rem}textarea,input,button{width:100%;box-sizing:border-box;margin:.4rem 0;padding:.7rem}button{cursor:pointer}.result{padding:1rem;background:#eef5ff;border-radius:8px;white-space:pre-wrap}</style></head>
+<body><h1>Phishing and Scam Detector</h1><p>Local educational screening tool. Do not submit secrets.</p>
+<form id="form"><label>URL<input id="url" maxlength="4096" placeholder="https://example.com"></label>
+<label>Message or email<textarea id="text" rows="5" maxlength="100000"></textarea></label>
+<label>HTML<textarea id="html" rows="5" maxlength="500000"></textarea></label>
+<button>Analyze</button></form><div id="result" class="result">Enter an input and analyze it.</div>
+<script>form.onsubmit=async e=>{e.preventDefault();const body={url:url.value||null,text:text.value||null,html:html.value||null};const r=await fetch('/detect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});result.textContent=JSON.stringify(await r.json(),null,2)}</script>
+</body></html>
