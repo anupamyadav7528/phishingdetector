@@ -10,6 +10,9 @@ SUSPICIOUS_WORDS = {
     "login", "verify", "account", "secure", "update", "bonus", "winner",
     "urgent", "password", "wallet", "payment", "invoice", "gift", "claim",
 }
+URGENCY_WORDS = {"urgent", "immediately", "now", "expires", "limited", "act"}
+REQUEST_WORDS = {"click", "confirm", "verify", "reset", "send", "transfer", "pay"}
+IMPERSONATION_WORDS = {"bank", "microsoft", "paypal", "amazon", "netflix", "irs", "support"}
 
 
 def url_features(url: str) -> dict[str, float]:
@@ -43,6 +46,7 @@ def url_features(url: str) -> dict[str, float]:
 
 def text_features(text: str) -> dict[str, float]:
     value = text or ""
+    low = value.lower()
     words = re.findall(r"[a-z0-9']+", value.lower())
     alpha_count = sum(character.isalpha() for character in value)
     return {
@@ -56,6 +60,11 @@ def text_features(text: str) -> dict[str, float]:
         "money_symbol_count": float(sum(value.count(symbol) for symbol in ("$", "€", "£"))),
         "question_count": float(value.count("?")),
         "has_phone_like": float(bool(re.search(r"\b\d{7,}\b", value))),
+        "urgency_count": float(sum(word in words for word in URGENCY_WORDS)),
+        "request_count": float(sum(word in words for word in REQUEST_WORDS)),
+        "impersonation_count": float(sum(word in words for word in IMPERSONATION_WORDS)),
+        "credential_count": float(sum(word in words for word in ("password", "credential", "otp", "code"))),
+        "money_request_count": float(sum(word in words for word in ("pay", "payment", "refund", "prize", "cash", "fee"))),
     }
 
 
