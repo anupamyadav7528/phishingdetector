@@ -46,4 +46,4 @@ No paid service, secret, or external API is required. `.env.example` documents o
 
 ## Optional Render deployment
 
-`render.yaml` defines a free web service. Create a Render Blueprint from this repository and deploy it; Render supplies `PORT` automatically. Model artifacts are intentionally not committed, so a fresh deployment serves the dashboard and graceful no-model responses until you add a private artifact build/storage workflow. No API credential is required by this project.
+`render.yaml` defines a free web service. Create a Render Blueprint from this repository and deploy it; Render supplies `PORT` automatically. During every Render build, the service generates the clearly marked synthetic smoke CSVs and trains URL, text, and HTML demo models into `artifacts/`. These models are demo-only and must not be used for security decisions or performance claims. No API credential is required by this project. A redeploy is required after changing `render.yaml`; the build log should show all three training commands and `/health` should list `html`, `text`, and `url`.

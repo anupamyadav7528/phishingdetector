@@ -3,7 +3,12 @@ services:
     name: phishing-scam-detector
     runtime: python
     plan: free
-    buildCommand: pip install -r requirements.txt
+    buildCommand: >-
+      pip install -r requirements.txt &&
+      python scripts/generate_smoke_data.py &&
+      python scripts/train.py --kind url --csv data/urls_synthetic_smoke.csv --out artifacts &&
+      python scripts/train.py --kind text --csv data/text_synthetic_smoke.csv --out artifacts &&
+      python scripts/train.py --kind html --csv data/html_synthetic_smoke.csv --out artifacts
     startCommand: uvicorn phishing_detector.api:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: MODEL_DIR
