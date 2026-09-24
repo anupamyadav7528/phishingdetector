@@ -1,12 +1,71 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Phishing and Scam Detector</title>
-<style>body{font:16px system-ui;max-width:800px;margin:2rem auto;padding:0 1rem}textarea,input,button{width:100%;box-sizing:border-box;margin:.4rem 0;padding:.7rem}button{cursor:pointer}.result{padding:1rem;background:#eef5ff;border-radius:8px;white-space:pre-wrap}</style></head>
-<body><h1>Phishing and Scam Detector</h1><p>Local educational screening tool. Do not submit secrets.</p>
-<form id="form"><label>URL<input id="url" maxlength="4096" placeholder="https://example.com"></label>
-<label>Message or email<textarea id="text" rows="5" maxlength="100000"></textarea></label>
-<label>HTML<textarea id="html" rows="5" maxlength="500000"></textarea></label>
-<button>Analyze</button></form><div id="result" class="result">Enter an input and analyze it.</div>
-<script>form.onsubmit=async e=>{e.preventDefault();const body={url:url.value||null,text:text.value||null,html:html.value||null};const r=await fetch('/detect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});result.textContent=JSON.stringify(await r.json(),null,2)}</script>
-</body></html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>PhishLens | Scam detector</title>
+  <style>
+    :root{--ink:#172033;--muted:#647089;--line:#dfe5ef;--brand:#3458d4;--brand-dark:#2443ad;--bg:#f5f7fb;--safe:#15803d;--safe-bg:#ecfdf3;--danger:#c2410c;--danger-bg:#fff7ed;--card:#fff;--shadow:0 16px 40px #23345b12}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f7f9ff,#f2f7f4);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+    .shell{max-width:1120px;margin:0 auto;padding:30px 18px 56px}.hero{display:flex;justify-content:space-between;gap:24px;align-items:end;margin-bottom:24px}
+    .eyebrow{color:var(--brand);font-weight:750;letter-spacing:.08em;text-transform:uppercase;font-size:.75rem}h1{font-size:clamp(2rem,5vw,3.6rem);line-height:1.05;margin:.35rem 0 .7rem;letter-spacing:-.04em}h2{font-size:1.25rem;margin:0 0 12px}p{color:var(--muted);margin:.3rem 0}
+    .notice{max-width:330px;background:#fff8e7;border:1px solid #f6d98a;border-radius:14px;padding:12px 14px;font-size:.88rem}
+    .grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:20px}.card{background:var(--card);border:1px solid #e7ebf2;border-radius:20px;box-shadow:var(--shadow);padding:22px}
+    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 16px}.tab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px;font-weight:700;color:var(--muted);cursor:pointer}.tab[aria-selected=true]{background:#edf1ff;border-color:#aab9f4;color:var(--brand-dark)}
+    label{font-weight:700;font-size:.9rem;display:block;margin-bottom:7px}textarea,input{font:inherit;width:100%;border:1px solid #cbd4e3;border-radius:12px;padding:12px;color:var(--ink);background:#fff}textarea{min-height:170px;resize:vertical}input{height:48px}.hint{font-size:.8rem;color:var(--muted);margin-top:7px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.primary,.secondary,.example{border:0;border-radius:11px;padding:11px 16px;font:inherit;font-weight:750;cursor:pointer}.primary{background:var(--brand);color:white;min-width:145px}.primary:hover{background:var(--brand-dark)}.primary:disabled{opacity:.65;cursor:wait}.secondary{background:#eef1f7;color:var(--ink)}.example{background:transparent;color:var(--brand);padding:5px 0;text-align:left}.examples{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px}
+    .status{min-height:26px;margin-top:12px;color:var(--danger);font-size:.9rem}.result-head{display:flex;justify-content:space-between;gap:18px;align-items:center}.score-wrap{display:flex;align-items:center;gap:18px}.score-ring{--score:0%;width:124px;height:124px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--danger) var(--score),#edf0f5 0);flex:none}.score-ring:after{content:"";grid-area:1/1;width:92px;height:92px;border-radius:50%;background:#fff}.score{grid-area:1/1;z-index:1;text-align:center;font-size:1.45rem;font-weight:800}.score small{display:block;font-size:.68rem;color:var(--muted);font-weight:600}.badge{display:inline-block;border-radius:999px;padding:5px 10px;font-size:.78rem;font-weight:800}.badge.safe{color:var(--safe);background:var(--safe-bg)}.badge.suspicious{color:var(--danger);background:var(--danger-bg)}
+    .components{display:grid;gap:10px;margin-top:20px}.component{border:1px solid var(--line);border-radius:12px;padding:12px}.component-top{display:flex;justify-content:space-between;font-weight:700}.bar{height:8px;background:#edf0f5;border-radius:99px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--danger);border-radius:99px}.explain{margin:18px 0 0;padding-left:20px;color:var(--muted)}.empty{color:var(--muted);padding:30px 0;text-align:center}.footer{margin-top:18px;text-align:center;color:var(--muted);font-size:.82rem}
+    @media(max-width:760px){.hero{display:block}.notice{max-width:none;margin-top:18px}.grid{grid-template-columns:1fr}.card{padding:18px}.result-head{align-items:flex-start}.score-wrap{justify-content:space-between}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div><div class="eyebrow">Local AI screening tool</div><h1>Pause before you trust it.</h1><p>Check a suspicious URL, message, or HTML snippet with explainable demo models.</p></div>
+      <aside class="notice" aria-label="Safety notice"><strong>Privacy first</strong><br>Do not paste passwords, private data, access tokens, or live malware.</aside>
+    </header>
+    <div class="grid">
+      <section class="card" aria-labelledby="input-title">
+        <h2 id="input-title">What would you like to check?</h2>
+        <div class="tabs" role="tablist" aria-label="Input type">
+          <button class="tab" role="tab" aria-selected="true" data-mode="url">URL</button>
+          <button class="tab" role="tab" aria-selected="false" data-mode="text">Message</button>
+          <button class="tab" role="tab" aria-selected="false" data-mode="html">HTML</button>
+        </div>
+        <form id="form" novalidate>
+          <div id="url-field"><label for="url">Website address</label><input id="url" type="url" maxlength="4096" placeholder="https://example.com/account"></div>
+          <div id="text-field" hidden><label for="text">Message or email</label><textarea id="text" maxlength="100000" placeholder="Paste the message without personal details..."></textarea></div>
+          <div id="html-field" hidden><label for="html">HTML snippet</label><textarea id="html" maxlength="500000" placeholder="Paste a safe, non-sensitive HTML snippet..."></textarea></div>
+          <div class="hint">The input stays in your browser except for the request to this API.</div>
+          <div class="actions"><button class="primary" id="analyze" type="submit">Analyze safely <span id="spinner" hidden>…</span></button><button class="secondary" id="clear" type="button">Clear</button></div>
+          <div class="examples" aria-label="Examples"><span class="hint">Try an example:</span><button class="example" type="button" data-example="safe">Safe URL</button><button class="example" type="button" data-example="suspicious">Suspicious URL</button></div>
+          <div class="status" id="status" role="alert" aria-live="polite"></div>
+        </form>
+      </section>
+      <section class="card" aria-labelledby="result-title" aria-live="polite">
+        <div id="empty" class="empty"><h2 id="result-title">Your result will appear here</h2><p>We will show a risk score, model components, and the signals that influenced it.</p></div>
+        <div id="result" hidden>
+          <div class="result-head"><div><h2 id="result-title">Screening result</h2><span id="badge" class="badge"></span></div><div class="score-wrap"><div class="score-ring" id="ring"><div class="score" id="score">0%<small>risk</small></div></div></div></div>
+          <div class="components" id="components"></div><h2 style="margin-top:22px">Why this result?</h2><ul class="explain" id="explanations"></ul>
+        </div>
+      </section>
+    </div>
+    <div class="footer">Educational demo only. A score is not proof of safety or maliciousness.</div>
+  </main>
+  <script>
+    const fields={url:document.querySelector('#url-field'),text:document.querySelector('#text-field'),html:document.querySelector('#html-field')};
+    const controls={url:document.querySelector('#url'),text:document.querySelector('#text'),html:document.querySelector('#html')};
+    let mode='url';
+    const status=document.querySelector('#status');
+    function setMode(next){mode=next;Object.keys(fields).forEach(k=>{fields[k].hidden=k!==next;document.querySelector(`[data-mode="${k}"]`).setAttribute('aria-selected',k===next)});status.textContent='';controls[next].focus()}
+    document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>setMode(tab.dataset.mode)));
+    document.querySelector('#clear').addEventListener('click',()=>{Object.values(controls).forEach(c=>c.value='');status.textContent='';document.querySelector('#result').hidden=true;document.querySelector('#empty').hidden=false;controls[mode].focus()});
+    document.querySelectorAll('.example').forEach(button=>button.addEventListener('click',()=>{setMode('url');controls.url.value=button.dataset.example==='safe'?'https://www.example.com/help':'http://192.0.2.1/verify-login?account=urgent';}));
+    function percent(value){return `${Math.round(Math.max(0,Math.min(1,value))*100)}%`}
+    function render(data){const score=Number(data.risk_score)||0;document.querySelector('#empty').hidden=true;document.querySelector('#result').hidden=false;document.querySelector('#score').innerHTML=`${percent(score)}<small>risk</small>`;document.querySelector('#ring').style.setProperty('--score',percent(score));const badge=document.querySelector('#badge');badge.textContent=data.label==='suspicious'?'Suspicious signals detected':'Likely safe';badge.className=`badge ${data.label==='suspicious'?'suspicious':'safe'}`;document.querySelector('#components').innerHTML=Object.entries(data.components||{}).map(([name,item])=>`<div class="component"><div class="component-top"><span>${name.toUpperCase()}</span><span>${percent(item.risk_score)}</span></div><div class="bar"><i style="width:${percent(item.risk_score)}"></i></div></div>`).join('')||'<p class="hint">No model component was available.</p>';document.querySelector('#explanations').innerHTML=(data.explanations||['No explanation was returned.']).map(item=>`<li>${item}</li>`).join('')}
+    document.querySelector('#form').addEventListener('submit',async event=>{event.preventDefault();status.textContent='';const value=controls[mode].value.trim();if(!value){status.textContent=`Enter a ${mode==='url'?'URL':mode==='text'?'message':'HTML snippet'} first.`;controls[mode].focus();return}const button=document.querySelector('#analyze');button.disabled=true;document.querySelector('#spinner').hidden=false;button.firstChild.textContent='Analyzing ';try{const response=await fetch('/detect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:mode==='url'?value:null,text:mode==='text'?value:null,html:mode==='html'?value:null})});const data=await response.json();if(!response.ok)throw new Error(data.detail||'The API rejected this request.');render(data)}catch(error){status.textContent=`Could not analyze this input: ${error.message||'check that the API is running.'}`}finally{button.disabled=false;document.querySelector('#spinner').hidden=true;button.firstChild.textContent='Analyze safely '}});
+  </script>
+</body>
+</html>
